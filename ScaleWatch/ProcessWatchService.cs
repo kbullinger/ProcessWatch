@@ -20,13 +20,14 @@ namespace ProcessWatch
         {
             InitializeComponent();
             _intervalTimer = new Timer();
+            settings = new AppSettings();
+
             ConfigureEventLog();
         }
 
         protected override void OnStart(string[] args)
         {
             eventLog.WriteEntry($"Starting {Constants.ApplicationName}");
-            settings = new AppSettings();
 
             try
             {
@@ -45,6 +46,10 @@ namespace ProcessWatch
             Log.Logger.Information("End OnStart.");
         }
 
+        /// <summary>
+        /// Configure serilog for both log files and email.
+        /// Note: Only Fatal events are written to email.
+        /// </summary>
         private void ConfigureSerilog()
         {
             if (settings.SendEmailAlerts)
@@ -54,8 +59,7 @@ namespace ProcessWatch
                 .RollingFile($"{settings.LogFileLocation}{settings.ApplicationName}.txt"
                 , Serilog.Events.LogEventLevel.Verbose
                 , retainedFileCountLimit: settings.RetainedLogFileCount
-                , outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {Exception}"
-)
+                , outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message}{NewLine}{Exception}")
                 .WriteTo
                 .Email(
                     new EmailConnectionInfo
@@ -74,7 +78,7 @@ namespace ProcessWatch
                     }, batchPostingLimit: settings.EmailBatchPostingLimit,
                     period: new TimeSpan(settings.EmailSendInterval),
                     restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Fatal,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} {Message} {Exception}"
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} WARNING: {Message} {Exception}"
                 )
                 .CreateLogger();
             }
@@ -93,16 +97,19 @@ namespace ProcessWatch
 
         protected override void OnStop()
         {
-            eventLog.WriteEntry($"Stopping {Constants.ApplicationName} service.");
+            eventLog.WriteEntry($"Stopping {settings.ApplicationName} service.");
             CleanUpResources();
         }
 
+        /// <summary>
+        /// Configure windows event log for basic logging on startup/shutdown.
+        /// </summary>
         private void ConfigureEventLog()
         {
             try
             {
                 eventLog = new EventLog("Application");
-                eventLog.Source = Constants.ApplicationName;
+                eventLog.Source = settings.ApplicationName;
             }
             catch (Exception ex)
             {
