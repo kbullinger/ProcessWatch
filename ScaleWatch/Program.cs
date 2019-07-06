@@ -4,7 +4,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 
-namespace ScaleWatch
+namespace ProcessWatch
 {
     static class Program
     {
@@ -16,7 +16,7 @@ namespace ScaleWatch
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new ScaleWatchService()
+                new ProcessWatchService()
             };
             ServiceBase.Run(ServicesToRun);
         }

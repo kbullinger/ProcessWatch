@@ -29,7 +29,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -90,12 +90,12 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="ScaleWatcher.cs" />
-    <Compile Include="ScaleWatchService.cs">
+    <Compile Include="ProcessWatcher.cs" />
+    <Compile Include="ProcessWatchService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ScaleWatchService.Designer.cs">
-      <DependentUpon>ScaleWatchService.cs</DependentUpon>
+    <Compile Include="ProcessWatchService.Designer.cs">
+      <DependentUpon>ProcessWatchService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -108,7 +108,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="ScaleWatch_2_TemporaryKey.pfx" />
   </ItemGroup>

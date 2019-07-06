@@ -1,6 +1,6 @@
-﻿namespace ScaleWatch
+﻿namespace ProcessWatch
 {
-    partial class ScaleWatchService
+    partial class ProcessWatchService
     {
         /// <summary> 
         /// Required designer variable.

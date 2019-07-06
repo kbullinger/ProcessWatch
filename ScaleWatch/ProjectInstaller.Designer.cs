@@ -1,4 +1,4 @@
-﻿namespace ScaleWatch
+﻿namespace ProcessWatch
 {
     partial class ProjectInstaller
     {
@@ -28,29 +28,31 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.serviceProcessInstaller1 = new System.ServiceProcess.ServiceProcessInstaller();
+            this.ProcessWatchServiceInstaller = new System.ServiceProcess.ServiceProcessInstaller();
             this.serviceInstaller1 = new System.ServiceProcess.ServiceInstaller();
             // 
-            // serviceProcessInstaller1
+            // ProcessWatchServiceInstaller
             // 
-            this.serviceProcessInstaller1.Password = null;
-            this.serviceProcessInstaller1.Username = null;
+            this.ProcessWatchServiceInstaller.Password = null;
+            this.ProcessWatchServiceInstaller.Username = null;
+            this.ProcessWatchServiceInstaller.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceProcessInstaller1_AfterInstall);
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.ServiceName = Constants.ApplicationName;
+            this.serviceInstaller1.ServiceName = "ScaleWatch";
+            this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceInstaller1_AfterInstall);
             // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
-            this.serviceProcessInstaller1,
+            this.ProcessWatchServiceInstaller,
             this.serviceInstaller1});
 
         }
 
         #endregion
 
-        private System.ServiceProcess.ServiceProcessInstaller serviceProcessInstaller1;
+        private System.ServiceProcess.ServiceProcessInstaller ProcessWatchServiceInstaller;
         private System.ServiceProcess.ServiceInstaller serviceInstaller1;
     }
 }

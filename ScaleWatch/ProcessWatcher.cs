@@ -4,22 +4,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Timers;
 
-namespace ScaleWatch
+namespace ProcessWatch
 {
-    public class ScaleWatcher
+    public interface IScaleWatcher
     {
-        private static EventLog eventLog;
+        void CheckProcesses(object source, ElapsedEventArgs args);
+        bool IsProcessResponding(Process process);
+    }
+
+    public class ProcessWatcher : IScaleWatcher
+    {
         private readonly IAppSettings _settings;
 
-        public ScaleWatcher(EventLog evtLog, IAppSettings settings)
+        public ProcessWatcher(IAppSettings settings)
         {
-            eventLog = evtLog;
             _settings = settings;
         }
 
         public void CheckProcesses(object source, ElapsedEventArgs args)
         {
-            Log.Logger.Information("Checking processes.");
+            Log.Logger.Information("Checking processes...");
             List<Process> processes = GetProcesses(_settings.ProcessNames);
 
             if (!AreAllProcessesResponding(processes))
@@ -32,26 +36,39 @@ namespace ScaleWatch
 
         private void RestartProcessesUsingScript(string batScript)
         {
-            ProcessStartInfo info = new ProcessStartInfo("cmd.exe", $"/c {batScript}");
-            info.CreateNoWindow = true;
-            info.UseShellExecute = false;
-            info.RedirectStandardError = true;
-            info.RedirectStandardOutput = true;
+            Log.Logger.Information("Restarting processes.");
+            ProcessStartInfo info = new ProcessStartInfo("cmd.exe", $"/c {batScript}")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
             using (var process = Process.Start(info))
             {
                 process.WaitForExit();
 
-                Log.Logger.Information(process.StandardOutput.ReadToEnd());
-                Log.Logger.Error(process.StandardError.ReadToEnd());
+                string standardOutput = process.StandardOutput.ReadToEnd();
+                string errorOutput = process.StandardError.ReadToEnd();
 
                 Log.Logger.Information("Process exit code: {exitCode}", process.ExitCode);
+
+                if (string.IsNullOrWhiteSpace(errorOutput))
+                {
+                    Log.Logger.Fatal("{batScript} did not complete successfully. Error was: {error}", batScript, errorOutput);
+                }
+                else
+                {
+                    Log.Logger.Fatal("One or more of the watched processes were unresponsive. All watched processes have been killed and restarted.");
+                }
             }
         }
 
         private void KillProcesses(List<Process> processes)
         {
-            Log.Logger.Information("Restarting processes.");
+            Log.Logger.Information("Killing processes.");
+
             processes.ForEach((process) =>
             {
                 process.Kill();
@@ -64,7 +81,7 @@ namespace ScaleWatch
             {
                 if (!IsProcessResponding(process))
                 {
-                    Log.Logger.Error("Process {process} is not responding.", process);
+                    Log.Logger.Error("Process {process} is not responding.", process.ProcessName);
                     return false;
                 }
             }
@@ -82,7 +99,7 @@ namespace ScaleWatch
             return processes;
         }
 
-        private bool IsProcessResponding(Process process) => process.Responding;
+        public bool IsProcessResponding(Process process) => false;// process.Responding;
 
     }
 }
