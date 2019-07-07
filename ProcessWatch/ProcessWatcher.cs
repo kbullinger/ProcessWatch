@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,8 +39,8 @@ namespace ProcessWatch
                 {
                     RestartProcessesUsingScript(_settings.RestartScriptFileLocation);
 
-                    // Wait five seconds and check status
-                    System.Threading.Thread.Sleep(5000);
+                    // Wait five and check status
+                    System.Threading.Thread.Sleep(2000);
                     if (CheckProcessesRestartedSuccessfully(GetProcesses(_settings.ProcessNames)))
                     {
                         Log.Logger.Fatal("One or more of the watched processes were unresponsive. All watched processes have been killed and restarted successfully.");
@@ -67,7 +68,7 @@ namespace ProcessWatch
         private void RestartProcessesUsingScript(string batScript)
         {
             Log.Logger.Information("Restarting processes.");
-            ProcessStartInfo info = new ProcessStartInfo("cmd.exe", "/c"+ @batScript)
+            ProcessStartInfo info = new ProcessStartInfo("cmd.exe", "/c "+ "\"" + @batScript +"\"")
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
@@ -75,19 +76,26 @@ namespace ProcessWatch
                 RedirectStandardOutput = true
             };
 
-            using (var process = Process.Start(info))
+            try
             {
-                process.WaitForExit();
-
-                string standardOutput = process.StandardOutput.ReadToEnd();
-                string errorOutput = process.StandardError.ReadToEnd();
-
-                Log.Logger.Information("Process exit code: {exitCode}", process.ExitCode);
-
-                if (!string.IsNullOrWhiteSpace(errorOutput))
+                using (var process = Process.Start(info))
                 {
-                    Log.Logger.Fatal("{batScript} did not complete successfully. Error was: {error}", batScript, errorOutput);
+                    process.WaitForExit();
+
+                    string standardOutput = process.StandardOutput.ReadToEnd();
+                    string errorOutput = process.StandardError.ReadToEnd();
+
+                    Log.Logger.Information("Process exit code: {exitCode}. Standard out: {standardoutput}. Standard error: {standarderror}.", process.ExitCode, standardOutput, errorOutput);
+
+                    if (!string.IsNullOrWhiteSpace(errorOutput))
+                    {
+                        Log.Logger.Fatal("{batScript} did not complete successfully. Error was: {error}", batScript, errorOutput);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "An exception occurred.");
+                throw ex;
             }
         }
 
@@ -155,7 +163,7 @@ namespace ProcessWatch
         /// </summary>
         /// <param name="process"></param>
         /// <returns></returns>
-        public bool IsProcessResponding(Process process) => process.Responding;
+        public bool IsProcessResponding(Process process) => false;// process.Responding;
 
     }
 }
