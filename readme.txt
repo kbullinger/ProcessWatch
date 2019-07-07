@@ -1,3 +1,16 @@
+Overview
+
+This service is designed to watch a set of processes and act if one or more is found to be Not Responding. 
+If configured, the service will execute a .bat script specified by the user to automatically restart the processes. 
+If configured, an alert will be emailed in the following cases:
+	1) If not configured to autorestart, an alert will be triggered notifying that one or more of the watched processes is Not Responding.
+	2) If configured to autorestart, an alert will be triggered notifying that one or more of the watched processes was Not Responding 
+		and all processes have been killed and restarted.
+	3) If configured to autorestart but not successful, an alert will be triggered notifying that one or more the watched processes
+		was Not Responding and were not restarted successfully.
+		
+All informational and error logs will be sent to flat files. Only fatal errors will be sent via email, if email is configured.
+
 Environment Setup
 
 1) If not already installed, install .NET Framework 4.0
