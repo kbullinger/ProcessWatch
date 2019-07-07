@@ -23,7 +23,7 @@ App Config Setup
 GENERAL SETTINGS
 	ApplicationName: Used in naming log files and email alerts. Should be the same as what you have named the service.
 	
-	StatusCheckIntervalMillis: Determines how frequently processes are checked.
+	StatusCheckIntervalMillis: Determines how frequently processes are checked in milliseconds
 	
 	AutoRestartOnFailure: When set to true, will execute the .bat script as specified by RestartScriptFileLocation after
 	finding a Not Responding process.
@@ -57,7 +57,7 @@ EMAIL ALERT SETTINGS
 	
 	MailServerPort: Output going email server port. Eg. 25
 	
-	EmailSendInterval: Frequency the service should check for and send alerts via email.
+	EmailSendInterval: Frequency the service should check for and send alerts via email in milliseconds.
 	
 	EmailBatchPostingLimit: Specifies the maximum number of alerts that should be queued before triggering an email, regardless of 
 	EmailSendInterval.
