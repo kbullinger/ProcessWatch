@@ -30,7 +30,7 @@ App Config Setup
 
 2) Edit the config file to fit your needs.
 
-GENERAL SETTINGS
+GENERAL SETTINGS (Required)
 	ApplicationName: Used in naming log files and email alerts. Should be the same as what you have named the service.
 	
 	StatusCheckIntervalMillis: Determines how frequently processes are checked in milliseconds
@@ -50,7 +50,7 @@ GENERAL SETTINGS
 	with no spaces.
 		Eg. "notepad,notepad++"
 	
-EMAIL ALERT SETTINGS
+EMAIL ALERT SETTINGS (If SendEmailAlerts is set to true, ALL settings in this section are required.)
 	SendEmailAlerts: When set to true, the service will attempt to configure and send email alerts when 
 	watched processes enter a Not Responding state. 
 	
