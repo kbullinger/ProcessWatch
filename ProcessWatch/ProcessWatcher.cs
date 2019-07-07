@@ -31,19 +31,27 @@ namespace ProcessWatch
             Log.Logger.Information("Checking processes...");
             List<Process> processes = GetProcesses(_settings.ProcessNames);
 
-            if (!AreAllProcessesResponding(processes))
+            if (processes.Any() && !AreAllProcessesResponding(processes))
             {
                 KillProcesses(processes);
-                RestartProcessesUsingScript(_settings.RestartScriptFileLocation);
+                if (_settings.AutoRestartOnFailure)
+                {
+                    RestartProcessesUsingScript(_settings.RestartScriptFileLocation);
 
-                // Wait five seconds and check status
-                System.Threading.Thread.Sleep(5000);
-                if (CheckProcessesRestartedSuccessfully(GetProcesses(_settings.ProcessNames)))
+                    // Wait five seconds and check status
+                    System.Threading.Thread.Sleep(5000);
+                    if (CheckProcessesRestartedSuccessfully(GetProcesses(_settings.ProcessNames)))
+                    {
+                        Log.Logger.Fatal("One or more of the watched processes were unresponsive. All watched processes have been killed and restarted successfully.");
+                    }
+                    else
+                    {
+                        Log.Logger.Fatal("One or more of the watched processes were unresponsive. Watched processes were not restarted properly.");
+                    }
+                }
+                else
                 {
-                    Log.Logger.Fatal("One or more of the watched processes were unresponsive. All watched processes have been killed and restarted successfully.");
-                } else
-                {
-                    Log.Logger.Fatal("Watched processes were not restarted properly.");
+                    Log.Logger.Fatal("One or more watched of the watched processes has failed. {ApplicationName} has been configured to not automatically restart watched processes.", _settings.ApplicationName);
                 }
             } else
             {
@@ -139,7 +147,6 @@ namespace ProcessWatch
             {
                 processes.AddRange(Process.GetProcessesByName(name));
             }
-            Log.Logger.Information("{process}", processes.First().Responding);
             return processes;
         }
 
@@ -148,7 +155,7 @@ namespace ProcessWatch
         /// </summary>
         /// <param name="process"></param>
         /// <returns></returns>
-        public bool IsProcessResponding(Process process) => false;// process.Responding;
+        public bool IsProcessResponding(Process process) => process.Responding;
 
     }
 }
