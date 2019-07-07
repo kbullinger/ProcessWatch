@@ -24,7 +24,15 @@ Service Setup
 
 2) Run the following command -> sc create [serviceName] binpath= "[path to ProcessWatch.exe]
 	Example: sc create ScaleWatcher binpath= "C:\Program Files\ScaleWatcher\ProcessWatch.exe"
-	
+
+3) Open Services and locate the newly created service
+
+4) Right click on the service and click Properties
+
+5) Navigate to the Log On tab
+
+6) Check the box for "Allow service to interact with Desktop" (This is what allows the service to open processes in the user's desktop)
+
 App Config Setup
 1) In the folder containing the program files for the service, locate the ProcessWatch.exe.config file.
 
