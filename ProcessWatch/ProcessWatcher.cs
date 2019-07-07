@@ -163,7 +163,7 @@ namespace ProcessWatch
         /// </summary>
         /// <param name="process"></param>
         /// <returns></returns>
-        public bool IsProcessResponding(Process process) => false;// process.Responding;
+        public bool IsProcessResponding(Process process) => process.Responding;
 
     }
 }
